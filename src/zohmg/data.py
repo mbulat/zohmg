@@ -242,7 +242,7 @@ def scan(table, columns, startrow, stoprow, basedimension, range, filters, data)
             # read possible old values, add.
             for column in r.columns:
                 t[dval] = t.get(dval, 0)
-                t[dval] += int(r.columns[column].value)
+                t[dval] += float(r.columns[column].value)
             # and save.
             data[timestamp] = dict_addition(t, data.get(timestamp, {}))
 
