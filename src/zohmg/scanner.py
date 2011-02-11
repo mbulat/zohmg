@@ -16,15 +16,13 @@
 # under the License.
 
 # lfm.data.hbase
-
-from hbase import Hbase
-from hbase.ttypes import *
-
 from thrift import Thrift
 from thrift.transport import TSocket
 from thrift.transport import TTransport
-from thrift.protocol  import TBinaryProtocol
-
+from thrift.protocol import TBinaryProtocol
+from hbase_thrift import Hbase
+from hbase_thrift.ttypes import ColumnDescriptor
+from hbase_thrift.ttypes import AlreadyExists, IOError, IllegalArgument
 
 # the default behaviour is to scan over all rows
 # and return all column families.
