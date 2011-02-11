@@ -28,8 +28,8 @@ import java.util.TreeMap;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapred.JobConf;
-import org.apache.hadoop.mapred.Mapper;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapred.OutputCollector;
 import org.apache.hadoop.mapred.Reporter;
 
@@ -41,7 +41,7 @@ import fm.last.darling.utils.Util;
 
 // the class we wrap around the user's mapper.
 // TODO FIXME this class is currently not operational
-public class MapperWrapper implements Mapper<LongWritable, Text, NSpacePoint, IntWritable> {
+public class MapperWrapper extends Mapper<LongWritable, Text, NSpacePoint, IntWritable> {
   private UserMapper usermapper;
   private List<List<Dimension>> rps; 
 
@@ -61,10 +61,10 @@ public class MapperWrapper implements Mapper<LongWritable, Text, NSpacePoint, In
   public void close() throws IOException {
   }
 
-  public void configure(JobConf conf) {
+  public void configure(Job conf) {
     try {
       //FIXME TODO this config file is never set, fix fix!
-      File datasetDef = new File(conf.get("ZOHMG.DATASET.FILE"));
+      File datasetDef = new File("ZOHMG.DATASET.FILE");
       rps = Util.readRequestedProjections(datasetDef);
     } catch (FileNotFoundException e) {
       throw new RuntimeException(e);

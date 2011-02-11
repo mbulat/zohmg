@@ -19,16 +19,16 @@
 package fm.last.darling;
 
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.hbase.io.BatchUpdate;
+import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.io.ImmutableBytesWritable;
-import org.apache.hadoop.hbase.mapred.TableOutputFormat;
+import org.apache.hadoop.hbase.mapreduce.TableOutputFormat;
 import org.apache.hadoop.io.IntWritable;
-import org.apache.hadoop.mapred.FileInputFormat;
-import org.apache.hadoop.mapred.FileOutputFormat;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapred.JobClient;
-import org.apache.hadoop.mapred.JobConf;
+import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapred.JobPriority;
-import org.apache.hadoop.mapred.TextInputFormat;
+import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 
 import fm.last.darling.io.records.NSpacePoint;
 import fm.last.darling.mapred.MapperWrapper;
@@ -38,22 +38,22 @@ import fm.last.darling.mapred.ZohmgReducer;
 public class ZohmgProgram {
   public static final JobPriority DEFAULT_JOB_PRIORITY = JobPriority.NORMAL;
 
-  public void start(String input) throws Exception {
+  public int start(String input) throws Exception {
     Path path = new Path(input);
 
     // TODO: read table/dataset from environment.
     String table = "zohmg";
 
-    JobConf job = new JobConf(ZohmgProgram.class);
+    Job job = new Job();
+    
     job.setJobName("zohmg!");
-    job.setJobPriority(DEFAULT_JOB_PRIORITY);
     FileInputFormat.addInputPath(job, path);
 
     Path output = new Path("yeah");
     FileOutputFormat.setOutputPath(job, output);
 
     // input
-    job.setInputFormat(TextInputFormat.class);
+    job.setInputFormatClass(TextInputFormat.class);
     // wrapper
     job.setMapperClass(MapperWrapper.class);
     job.setMapOutputKeyClass(NSpacePoint.class);
@@ -61,11 +61,11 @@ public class ZohmgProgram {
     // output
     job.setCombinerClass(ZohmgCombiner.class);
     job.setReducerClass(ZohmgReducer.class);
-    job.setOutputFormat(TableOutputFormat.class);
+    job.setOutputFormatClass(TableOutputFormat.class);
     job.setOutputKeyClass(ImmutableBytesWritable.class);
-    job.setOutputValueClass(BatchUpdate.class);
-    job.set(TableOutputFormat.OUTPUT_TABLE, table);
+    job.setOutputValueClass(Put.class);
+    //job.set(TableOutputFormat.OUTPUT_TABLE, table);
 
-    JobClient.runJob(job);
+    return job.waitForCompletion(true) ? 0 : 1;
   }
 }

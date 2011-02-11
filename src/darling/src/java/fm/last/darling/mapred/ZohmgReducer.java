@@ -21,22 +21,20 @@ package fm.last.darling.mapred;
 import java.io.IOException;
 import java.util.Iterator;
 
-import org.apache.hadoop.hbase.io.BatchUpdate;
+import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.io.ImmutableBytesWritable;
 import org.apache.hadoop.io.IntWritable;
-import org.apache.hadoop.mapred.MapReduceBase;
 import org.apache.hadoop.mapred.OutputCollector;
-import org.apache.hadoop.mapred.Reducer;
+import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapred.Reporter;
 
 import fm.last.darling.hbase.HBaseUtils;
 import fm.last.darling.io.records.NSpacePoint;
 import fm.last.darling.nspace.Projection;
 
-public class ZohmgReducer extends MapReduceBase implements
-    Reducer<NSpacePoint, IntWritable, ImmutableBytesWritable, BatchUpdate> {
+public class ZohmgReducer extends Reducer<NSpacePoint, IntWritable, ImmutableBytesWritable, Put> {
   public void reduce(NSpacePoint point, Iterator<IntWritable> values,
-      OutputCollector<ImmutableBytesWritable, BatchUpdate> output, Reporter reporter) throws IOException {
+      OutputCollector<ImmutableBytesWritable, Put> output, Reporter reporter) throws IOException {
     // sum the values.
     int sum = 0;
     while (values.hasNext())
@@ -49,11 +47,19 @@ public class ZohmgReducer extends MapReduceBase implements
     // HBase stuff.
     byte[] rowkey = HBaseUtils.formatRowkey(point.getUnit(), point.getTimestamp());
     ImmutableBytesWritable rk = new ImmutableBytesWritable(rowkey);
-    BatchUpdate update = new BatchUpdate(rowkey);
+    Put put = new Put(rowkey);
 
     Projection p = new Projection(point);
-    update.put(p.toHBaseCFQ(), n);
+    
+    String cfq = p.toHBaseCFQ();
+    
+    String[] parts = cfq.split(":");
+    
+    String family    = parts[0];
+    String qualifier = parts[1];
+    
+    put.add(family.getBytes("UTF-8"), qualifier.getBytes("UTF-8"), n);
     // dispatch to HBase.
-    output.collect(rk, update);
+    output.collect(rk, put);
   }
 }
