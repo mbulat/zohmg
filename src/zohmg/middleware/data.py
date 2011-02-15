@@ -52,7 +52,7 @@ class data(object):
     # answer query.
     def __call__(self, environ, start_response):
         mime_type = 'text/plain' # under what type we serve json.
-        content_type = [('content-type', mime_type)]
+        headers = [('Content-Type', mime_type), ('Access-Control-Allow-Origin', '*')]
 
         # TODO: check that table exists, exit gracefully if not.
 
@@ -71,31 +71,31 @@ class data(object):
 
         except zohmg.data.DataNotFound, (instance):
             print >>sys.stderr, "Data not found: ", instance.error
-            start_response('200 OK', content_type)
+            start_response('200 OK', headers)
             return json_of("data not found: " + instance.error, 200, errorcallback)
 
         except zohmg.data.MissingArguments, (instance):
             print >>sys.stderr, "400 Bad Request: missing arguments."
-            #start_response('400 Bad Request', content_type)
-            start_response('200 OK', content_type)
+            #start_response('400 Bad Request', headers)
+            start_response('200 OK', headers)
             return json_of("Query is missing arguments: " + instance.error, 400, errorcallback)
             # TODO: print list of required arguments.
 
         except zohmg.data.NoSuitableProjection, (instance):
             print >>sys.stderr, "400 Bad Request: No suitable projection. ", instance.error
-            #start_response('400 Bad Request', content_type)
-            start_response('200 OK', content_type)
+            #start_response('400 Bad Request', headers)
+            start_response('200 OK', headers)
             return json_of(" " + instance.error, 400, errorcallback)
 
         except Exception, e:
             print >>sys.stderr, "Error: ", e
-            #start_response('500 Internal Server Error', content_type)
-            start_response('200 OK', content_type)
+            #start_response('500 Internal Server Error', headers)
+            start_response('200 OK', headers)
             return json_of("egads!, I failed in serving you: " + str(e), 500, errorcallback)
 
         elapsed = (time.time() - start)
         sys.stderr.write("hbase query+prep: %s\n\n" % elapsed)
 
         # serve output.
-        start_response('200 OK', content_type) # or text/x-json
+        start_response('200 OK', headers) # or text/x-json
         return json
