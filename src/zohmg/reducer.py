@@ -25,7 +25,14 @@ class Reducer(object):
 
     def __call__(self, key, values):
         timestamp, projection, dimensions, unit = key
-        value = sum(values)
+        #value = sum(values)
+        # testing out average... want to pull aggregation type from dataset.yaml
+        total = 0.0
+        num = 0
+        for item in values:
+            total += item
+            num += 1
+        value = total / num
 
         if value == 0:
             return
