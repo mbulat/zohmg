@@ -37,7 +37,7 @@ class Reducer(object):
             if value == 0:
                     return
         else:
-            value - sum(values)
+            value = sum(values)
 
         # encode dimensions and their attributes in the rowkey.
         # (it's important that we get the ordering right.)
