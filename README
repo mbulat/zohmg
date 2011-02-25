@@ -236,6 +236,7 @@ def map(key, value):
     measurements['plays']   = 1
     measurements['seconds'] = int(length)
     measurements['loves']   = int(love)
+    measurements['stars']   = float(stars)
 
     yield ymd, dimensions, measurements
 
