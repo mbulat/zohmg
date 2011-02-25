@@ -80,7 +80,7 @@ those dimensions.
 The length of a clip, whether it was loved, etc, are called
 measurements. In the configuration, which we will take a look at
 shortly, we define the units of measurements. Measurements must be
-integers so that they can be summed.
+integers or floats so that they can be summed or averaged.
 
 Simple enough!
 
@@ -115,8 +115,8 @@ the streaming jar built for you.
 
 config/dataset.yaml:
 
-Defining your data set means defining dimensions, projections and
-units.
+Defining your data set means defining dimensions, projections,
+units and aggregations.
 
 The dimensions lets Zohmg know what your data looks like while the
 projections hints at what queries you will want to ask. Once you get
@@ -127,6 +127,9 @@ For example, if you wish to find out how many times a certain clip has
 been watched broken down by country, you would want to set up a
 projection where clip is the first dimension and country is the second
 one.
+
+Aggregations specify how each unit will be aggregated. Currently each 
+unit can be summed or averaged.
 
 For the television station, something like the following will do just
 fine.
@@ -154,6 +157,13 @@ units:
  - plays
  - loves
  - seconds
+ - stars
+
+aggregations:
+ plays: sum
+ loves: sum
+ seconds: sum
+ stars: average
 
 
 After you've edited environment.py and dataset.yaml:
