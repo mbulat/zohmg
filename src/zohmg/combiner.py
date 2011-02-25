@@ -17,15 +17,19 @@
 
 class Combiner(object):
     def __init__(self):
-        pass
+        self.config = Config()
 
     def __call__(self, key, values):
-        #value = sum(values)
-        # testing out average... want to pull aggregation type from dataset.yaml
-        total = 0.0
-        num = 0
-        for item in values:
-            total += item
-            num += 1
-        value = total / num
+        # currently only supports average and sum
+        timestamp, projection, dimensions, unit = key
+        if self.config.aggregations()[unit] == 'average':
+            total = 0.0
+            num = 0
+            for item in values:
+                total += item
+                num += 1
+            value = total / num
+        else:
+            value = sum(values)
+
         yield key, value

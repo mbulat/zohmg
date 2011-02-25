@@ -25,17 +25,19 @@ class Reducer(object):
 
     def __call__(self, key, values):
         timestamp, projection, dimensions, unit = key
-        #value = sum(values)
-        # testing out average... want to pull aggregation type from dataset.yaml
-        total = 0.0
-        num = 0
-        for item in values:
-            total += item
-            num += 1
-        value = total / num
+        # currently only supports average and sum
+        if self.config.aggregations()[unit] == 'average':
+            total = 0.0
+            num = 0
+            for item in values:
+                    total += item
+                    num += 1
+            value = total / num
 
-        if value == 0:
-            return
+            if value == 0:
+                    return
+        else:
+            value - sum(values)
 
         # encode dimensions and their attributes in the rowkey.
         # (it's important that we get the ordering right.)

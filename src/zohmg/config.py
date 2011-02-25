@@ -24,6 +24,7 @@ import os, re, sys, time
 #   'dimensions' - list of strings
 #   'units' - list of strings
 #   'projections' - list of lists
+#   'aggregations' - list of lists
 
 
 
@@ -110,6 +111,8 @@ class Config(object):
         # ['country', 'country-domain-useragent-usertype']
         # => [['country'], ['country', 'domain', 'useragent', 'usertype']]
         return map(lambda s : s.split('-'), self.config['projections'])
+    def aggregations(self):
+        return self.config['aggregations']
 
     # returns True if configuration is sane,
     # False otherwise.
@@ -121,6 +124,7 @@ class Config(object):
             ds = self.dimensions()
             us = self.units()
             ps = self.projections()
+            ag = self.aggregations()
         except:
             # might as well return straight away; nothing else will work.
             print >>sys.stderr, "Configuration error: Missing definition of dataset, dimensions, units, projections."
@@ -138,6 +142,12 @@ class Config(object):
                 if d not in ds:
                     print >>sys.stderr, "Configuration error: %s is a reference to an unkown dimension." % d
                     sane = False
+
+        # also, the configuration may not reference unknown units.
+        for u in ag.keys():
+            if u not in us:
+                print >>sys.stderr, "Configuration error: %s is a reference to an unkown unit." % u
+                sane = False
 
         # also, there must be no funny characters in the name of dimensions or units.
         # dimensions and units will feature in the columnfamily name and rowkey respectively.
