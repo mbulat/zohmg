@@ -15,6 +15,8 @@
 # specific language governing permissions and limitations
 # under the License.
 
+from zohmg.config import Config
+
 class Combiner(object):
     def __init__(self):
         self.config = Config()
